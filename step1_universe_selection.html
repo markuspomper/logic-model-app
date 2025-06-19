@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Universe Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .queue {
+            margin-top: 20px;
+        }
+        .queue-item {
+            display: inline-block;
+            font-size: 2rem;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Step 1: Universe Selection</h1>
+        <p><strong>Let's select the elements of the universe first.</strong></p>
+        <div style="background-color: #e0f7ff; padding: 20px; border-radius: 8px; width: fit-content; margin: 10px auto;">
+            <h3>Universe \( |\mathfrak{A}| \)</h3>
+            <select id="emoji-picker">
+                <option value="😀">😀</option>
+                <option value="🚀">🚀</option>
+                <option value="🌟">🌟</option>
+                <option value="🍎">🍎</option>
+                <option value="🎉">🎉</option>
+                <option value="🐱">🐱</option>
+                <option value="⚽">⚽</option>
+                <option value="📚">📚</option>
+                <option value="🎵">🎵</option>
+                <option value="🧩">🧩</option>
+            </select>
+            <button onclick="addEmoji()">Add Emoji</button>
+            <button onclick="finalizeQueue()">Done</button>
+            <div id="universe-display" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let queue = [];
+
+        function addEmoji() {
+            const picker = document.getElementById("emoji-picker");
+            const emoji = picker.value;
+            queue.push(emoji);
+            updateUniverseDisplay();
+        }
+
+        function updateUniverseDisplay() {
+            const display = document.getElementById("universe-display");
+            display.innerHTML = '';
+            queue.forEach(item => {
+                const span = document.createElement("span");
+                span.className = 'queue-item';
+                span.textContent = item;
+                display.appendChild(span);
+                display.appendChild(document.createElement("br"));
+            });
+        }
+
+        function finalizeQueue() {
+            alert("Universe finalized. You can now proceed to the next step.");
+        }
+    </script>
+</body>
+</html>
