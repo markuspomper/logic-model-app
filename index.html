@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 1: Universe Selection</title>
+    <title>Interactive Logic Model App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,30 +30,46 @@
 </head>
 <body>
     <div class="container">
-        <h1>Step 1: Universe Selection</h1>
-        <p><strong>Let's select the elements of the universe first.</strong></p>
-        <div style="background-color: #e0f7ff; padding: 20px; border-radius: 8px; width: fit-content; margin: 10px auto;">
-            <h3>Universe \( |\mathfrak{A}| \)</h3>
-            <select id="emoji-picker">
-                <option value="😀">😀</option>
-                <option value="🚀">🚀</option>
-                <option value="🌟">🌟</option>
-                <option value="🍎">🍎</option>
-                <option value="🎉">🎉</option>
-                <option value="🐱">🐱</option>
-                <option value="⚽">⚽</option>
-                <option value="📚">📚</option>
-                <option value="🎵">🎵</option>
-                <option value="🧩">🧩</option>
-            </select>
-            <button onclick="addEmoji()">Add Emoji</button>
-            <button onclick="finalizeQueue()">Done</button>
-            <div id="universe-display" style="margin-top: 15px;"></div>
+        <h1>Interactive Logic Model App</h1>
+        
+        <!-- Step 1: Universe Selection -->
+        <div id="step1">
+            <p><strong>Let's select the elements of the universe first.</strong></p>
+            <div style="background-color: #e0f7ff; padding: 20px; border-radius: 8px; width: fit-content; margin: 10px auto;">
+                <h3>Universe \( |\mathfrak{A}| \)</h3>
+                <select id="emoji-picker">
+                    <option value="😀">😀</option>
+                    <option value="🚀">🚀</option>
+                    <option value="🌟">🌟</option>
+                    <option value="🍎">🍎</option>
+                    <option value="🎉">🎉</option>
+                    <option value="🐱">🐱</option>
+                    <option value="⚽">⚽</option>
+                    <option value="📚">📚</option>
+                    <option value="🎵">🎵</option>
+                    <option value="🧩">🧩</option>
+                </select>
+                <button onclick="addEmoji()">Add Emoji</button>
+                <button onclick="finalizeQueue()">Done</button>
+                <div id="universe-display" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <!-- Step 2: Relation Definition -->
+        <div id="step2" style="display: none;">
+            <p><strong>Now let us define the elements of the relation</strong> \( \leq^{\mathfrak{A}} \).</p>
+            <select id="pair-first"></select>
+            <select id="pair-second"></select>
+            <button onclick="addPair()">Add Pair</button>
+            <button onclick="finalizeRelation()">Done</button>
+            <p id="pair-message" style="color: red;"></p>
+            <div id="relation-visual" style="margin-top: 20px;"></div>
         </div>
     </div>
 
     <script>
         let queue = [];
+        let relation = [];
 
         function addEmoji() {
             const picker = document.getElementById("emoji-picker");
@@ -75,7 +91,76 @@
         }
 
         function finalizeQueue() {
-            alert("Universe finalized. You can now proceed to the next step.");
+            alert("Universe finalized. Now moving to Step 2.");
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+            document.getElementById("step2").scrollIntoView({ behavior: "smooth" });
+            populatePairSelectors();
+        }
+
+        function populatePairSelectors() {
+            const first = document.getElementById("pair-first");
+            const second = document.getElementById("pair-second");
+            first.innerHTML = '';
+            second.innerHTML = '';
+            queue.forEach(emoji => {
+                const opt1 = document.createElement("option");
+                const opt2 = document.createElement("option");
+                opt1.value = opt2.value = emoji;
+                opt1.textContent = opt2.textContent = emoji;
+                first.appendChild(opt1);
+                second.appendChild(opt2);
+            });
+        }
+
+        function addPair() {
+            const a = document.getElementById("pair-first").value;
+            const b = document.getElementById("pair-second").value;
+            const message = document.getElementById("pair-message");
+
+            if (a === b) {
+                message.textContent = "Reflexive pairs are allowed, but consider if they are meaningful.";
+            } else if (relation.some(pair => pair[0] === a && pair[1] === b)) {
+                message.textContent = "Pair already selected";
+                return;
+            } else {
+                relation.push([a, b]);
+                message.textContent = "";
+            }
+
+            updateRelationVisual();
+        }
+
+        function updateRelationVisual() {
+            const container = document.getElementById("relation-visual");
+            container.innerHTML = '';
+
+            queue.forEach(emoji => {
+                const div = document.createElement("div");
+                div.textContent = emoji;
+                div.style.fontSize = "2rem";
+                div.style.margin = "10px";
+                div.style.position = "relative";
+                div.style.display = "inline-block";
+                container.appendChild(div);
+            });
+
+            // Draw arrows using SVG
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100");
+            svg.style.position = "absolute";
+            svg.style.top = "0";
+            svg.style.left = "0";
+
+            // (Optional) Add arrows between elements here using coordinates
+            // This part can be enhanced with canvas or SVG libraries
+
+            container.appendChild(svg);
+        }
+
+        function finalizeRelation() {
+            alert("Relation finalized. You can now proceed to the next step.");
         }
     </script>
 </body>
