@@ -26,6 +26,26 @@
             font-size: 2rem;
             margin: 0 5px;
         }
+        .relation-arrow {
+            width: 2px;
+            height: 20px;
+            background-color: #333;
+            margin: 0 auto;
+        }
+        .relation-loop {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            position: relative;
+            top: -10px;
+            left: 10px;
+        }
+        .relation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -58,12 +78,17 @@
         <!-- Step 2: Relation Definition -->
         <div id="step2" style="display: none;">
             <p><strong>Now let us define the elements of the relation</strong> \( \leq^{\mathfrak{A}} \).</p>
+            <div style="background-color: #e0f7ff; padding: 20px; border-radius: 8px; width: fit-content; margin: 10px auto;">
+                <h3>Universe \( |\mathfrak{A}| \)</h3>
+                <div id="universe-step2" style="font-size: 2rem;"></div>
+            </div>
             <select id="pair-first"></select>
             <select id="pair-second"></select>
             <button onclick="addPair()">Add Pair</button>
             <button onclick="finalizeRelation()">Done</button>
             <p id="pair-message" style="color: red;"></p>
             <div id="relation-visual" style="margin-top: 20px;"></div>
+            <div id="relation-display" style="margin-top: 20px;"></div>
         </div>
     </div>
 
@@ -74,7 +99,15 @@
         function addEmoji() {
             const picker = document.getElementById("emoji-picker");
             const emoji = picker.value;
+            const message = document.getElementById("pair-message");
+
+            if (queue.includes(emoji)) {
+                message.textContent = "This emoji has already been selected.";
+                return;
+            }
+
             queue.push(emoji);
+            message.textContent = "";
             updateUniverseDisplay();
         }
 
@@ -86,7 +119,6 @@
                 span.className = 'queue-item';
                 span.textContent = item;
                 display.appendChild(span);
-                display.appendChild(document.createElement("br"));
             });
         }
 
@@ -96,6 +128,7 @@
             document.getElementById("step2").style.display = "block";
             document.getElementById("step2").scrollIntoView({ behavior: "smooth" });
             populatePairSelectors();
+            updateUniverseStep2();
         }
 
         function populatePairSelectors() {
@@ -113,22 +146,31 @@
             });
         }
 
+        function updateUniverseStep2() {
+            const display = document.getElementById("universe-step2");
+            display.innerHTML = '';
+            queue.forEach(item => {
+                const span = document.createElement("span");
+                span.className = 'queue-item';
+                span.textContent = item;
+                display.appendChild(span);
+            });
+        }
+
         function addPair() {
             const a = document.getElementById("pair-first").value;
             const b = document.getElementById("pair-second").value;
             const message = document.getElementById("pair-message");
 
-            if (a === b) {
-                message.textContent = "Reflexive pairs are allowed, but consider if they are meaningful.";
-            } else if (relation.some(pair => pair[0] === a && pair[1] === b)) {
-                message.textContent = "Pair already selected";
+            if (relation.some(pair => pair[0] === a && pair[1] === b)) {
+                message.textContent = "This pair has already been selected. Remove? Yes/No";
                 return;
-            } else {
-                relation.push([a, b]);
-                message.textContent = "";
             }
 
+            relation.push([a, b]);
+            message.textContent = "";
             updateRelationVisual();
+            updateRelationDisplay();
         }
 
         function updateRelationVisual() {
@@ -153,15 +195,49 @@
             svg.style.top = "0";
             svg.style.left = "0";
 
-            // (Optional) Add arrows between elements here using coordinates
-            // This part can be enhanced with canvas or SVG libraries
+            relation.forEach(pair => {
+                const [a, b] = pair;
+                const indexA = queue.indexOf(a);
+                const indexB = queue.indexOf(b);
+
+                if (indexA !== -1 && indexB !== -1) {
+                    const x1 = indexA * 40 + 20;
+                    const y1 = 20;
+                    const x2 = indexB * 40 + 20;
+                    const y2 = 20;
+
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x1);
+                    line.setAttribute("y1", y1);
+                    line.setAttribute("x2", x2);
+                    line.setAttribute("y2", y2);
+                    line.setAttribute("stroke", "black");
+                    svg.appendChild(line);
+
+                    if (a === b) {
+                        const loop = document.createElement("div");
+                        loop.className = "relation-loop";
+                        container.appendChild(loop);
+                    }
+                }
+            });
 
             container.appendChild(svg);
         }
 
-        function finalizeRelation() {
-            alert("Relation finalized. You can now proceed to the next step.");
+        function updateRelationDisplay() {
+            const display = document.getElementById("relation-display");
+            display.innerHTML = `\(\leq^{\mathfrak{A}} = \{ ${relation.map(pair => `(${pair[0]}, ${pair[1]})`).join(', ')} \}\)`;
+            MathJax.typesetPromise();
         }
+
+        function finalizeRelation() {
+            alert("Relation finalized.");
+        }
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
 </body>
 </html>
